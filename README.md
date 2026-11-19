@@ -1,8 +1,10 @@
 # Uncertainty-aware imaging agent for longitudinal retinal analysis
 
+> **Work in progress.** This is an ongoing research project. All results below come from the rule-based planner; the LLM (Claude) planner is implemented but not yet evaluated.
+
 A small agent that compares two fundus images of the same eye taken at different visits, measures how the vessels changed, and **decides by itself when its own measurement should not be trusted**. Every step is written to an audit trace.
 
-Full write-up for non-specialists, including what went wrong and why this is not yet publishable: [docs/REPORT.md](docs/REPORT.md).
+Full write-up for non-specialists, including what went wrong and why this is not yet publishable: [docs/REPORT.md](docs/REPORT.md). File-by-file explanation of the code and every design choice: [docs/CODE_WALKTHROUGH.md](docs/CODE_WALKTHROUGH.md).
 
 The question behind it: segmentation models are accurate on single, clean images, but in a longitudinal setting a bad acquisition or a bad alignment silently turns into a wrong "progression" call. An agent that calls tools, checks their uncertainty, retries, and defers to a clinician with a reason is easier to trust than a single number.
 
