@@ -34,11 +34,12 @@ TOOL_SPECS = [
          "summary": {"type": "string"}}, "required": ["decision", "summary"]}},
 ]
 
-SYSTEM = f"""You assess change in retinal vessels between two visits of the same eye.
-Use the tools; never guess numbers. Policy: {json.dumps(POLICY)}.
+SYSTEM_TEMPLATE = """You assess change in retinal vessels between two visits of the same eye.
+Use the tools; never guess numbers. Policy: {policy}.
 Procedure: segment both visits; if a segmentation is outside policy, retry it once with tta=full and mc_passes=4;
 if it is still outside policy, defer and say why. Register; if alignment is outside policy, defer.
-Otherwise measure both visits, compare, and report. Only claim a change if it exceeds the uncertainty band.
+Otherwise measure both visits and compare. If compare says the change is not plausible, defer: the model may be
+confidently wrong. Otherwise report. Only claim a change if compare says it is beyond uncertainty.
 Keep summaries to two sentences, written for a clinician."""
 
 
@@ -66,6 +67,7 @@ class Agent:
             res = tools.measure(c, args["visit"])
         elif name == "compare":
             res = tools.compare(c)
+            self.state["plausible"] = res.get("plausible", True)
         elif name == "finish":
             res = self._guard_finish(args)
         else:
@@ -79,6 +81,8 @@ class Agent:
             problems = [f"{v} segmentation outside policy" for v, ok in self.state["seg_ok"].items() if not ok]
             if self.state["reg_ok"] is False:
                 problems.append("registration outside policy")
+            if self.state.get("plausible") is False:
+                problems.append("measured change is physiologically implausible")
             if len(self.state["seg_ok"]) < 2 or self.state["reg_ok"] is None:
                 problems.append("not all checks were run")
             if problems:
@@ -88,7 +92,7 @@ class Agent:
     # ---- planners ---------------------------------------------------------------
     def run(self) -> dict:
         result = self._run_claude() if self.planner == "claude" else self._run_rules()
-        return {"decision": result, "trace": self.trace, "policy": POLICY, "planner": self.planner,
+        return {"decision": result, "trace": self.trace, "policy": dict(POLICY), "planner": self.planner,
                 "model": self.model if self.planner == "claude" else None}
 
     def _run_rules(self):
@@ -107,6 +111,10 @@ class Agent:
         self.call("measure", {"visit": "baseline"})
         self.call("measure", {"visit": "followup"})
         cmp = self.call("compare", {})
+        if not cmp["plausible"]:
+            return self.call("finish", {"decision": "defer", "summary":
+                f"Measured {cmp['summary']}, which is implausible between two visits. One acquisition likely failed "
+                "although the model was confident. Please review both images."})
         return self.call("finish", {"decision": "report", "summary": cmp["summary"].capitalize() + "."})
 
     def _run_claude(self):
@@ -114,7 +122,8 @@ class Agent:
         client = anthropic.Anthropic()
         messages = [{"role": "user", "content": "New case: baseline and follow-up fundus images are loaded. Assess it."}]
         for _ in range(self.max_steps):
-            resp = client.messages.create(model=self.model, max_tokens=1024, system=SYSTEM,
+            system = SYSTEM_TEMPLATE.format(policy=json.dumps(POLICY))
+            resp = client.messages.create(model=self.model, max_tokens=1024, system=system,
                                           tools=TOOL_SPECS, messages=messages)
             messages.append({"role": "assistant", "content": resp.content})
             uses = [b for b in resp.content if b.type == "tool_use"]

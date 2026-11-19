@@ -1,0 +1,12 @@
+﻿
+[stable] planner=rules
+  steps: segment(baseline,basic) -> segment(followup,basic) -> register -> measure -> measure -> compare -> finish
+  REPORT: Decrease in vessel density of 0.8% (within measurement uncertainty).
+
+[progression] planner=rules
+  steps: segment(baseline,basic) -> segment(followup,basic) -> register -> measure -> measure -> compare -> finish
+  REPORT: Decrease in vessel density of 20.1%.
+
+[poor_quality] planner=rules
+  steps: segment(baseline,basic) -> segment(followup,basic) -> segment(followup,full) -> finish
+  DEFER: The followup image is too uncertain to measure (mean std 0.0857, ambiguous ratio 0.1584) even after 8x TTA and MC dropout. Please review image quality.

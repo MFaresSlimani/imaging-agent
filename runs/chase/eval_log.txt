@@ -1,0 +1,61 @@
+﻿{
+  "n_calib": 16,
+  "n_test": 32,
+  "fitted_policy": {
+    "max_uncertainty": 0.0871,
+    "max_ambiguous_ratio": 0.262,
+    "min_registration_ncc": 0.8,
+    "min_detectable_change": null,
+    "max_plausible_change": 0.3
+  },
+  "test_spearman_std_vs_error": 0.9626099706744867,
+  "test_auroc_std_detects_bad": 1.0,
+  "test_bad_caught": "12/12",
+  "test_good_wrongly_deferred": "0/20",
+  "test_mean_dice_accepted": 0.8048424056413431,
+  "test_mean_dice_deferred": 0.44247498848840544,
+  "per_strength": {
+    "0.0": {
+      "dice": 0.8224512609143282,
+      "mean_std": 0.0438125
+    },
+    "0.4": {
+      "dice": 0.8042394132815606,
+      "mean_std": 0.056737499999999996
+    },
+    "0.7": {
+      "dice": 0.7192266591612579,
+      "mean_std": 0.0874
+    },
+    "1.0": {
+      "dice": 0.3299011634788188,
+      "mean_std": 0.16294999999999998
+    }
+  }
+}
+repeatability limit: 0.0292 from drifts [0.0083, 0.0099, 0.0195, 0.0194]
+{'image': 'Image_11L', 'scenario': 'stable', 'decision': 'report', 'significant': False, 'measured_density_change': -0.0116, 'true_vessel_area_change': 0.0}
+{'image': 'Image_11L', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.0947, 'true_vessel_area_change': -0.1018}
+{'image': 'Image_11L', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': None, 'measured_density_change': None, 'true_vessel_area_change': -0.1018}
+{'image': 'Image_11R', 'scenario': 'stable', 'decision': 'report', 'significant': False, 'measured_density_change': -0.0179, 'true_vessel_area_change': 0.0}
+{'image': 'Image_11R', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.052, 'true_vessel_area_change': -0.0727}
+{'image': 'Image_11R', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': None, 'measured_density_change': None, 'true_vessel_area_change': -0.0727}
+{'image': 'Image_12L', 'scenario': 'stable', 'decision': 'report', 'significant': False, 'measured_density_change': -0.0081, 'true_vessel_area_change': 0.0}
+{'image': 'Image_12L', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.0528, 'true_vessel_area_change': -0.0567}
+{'image': 'Image_12L', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': None, 'measured_density_change': None, 'true_vessel_area_change': -0.0567}
+{'image': 'Image_12R', 'scenario': 'stable', 'decision': 'report', 'significant': False, 'measured_density_change': 0.002, 'true_vessel_area_change': 0.0}
+{'image': 'Image_12R', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.0857, 'true_vessel_area_change': -0.0972}
+{'image': 'Image_12R', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': None, 'measured_density_change': None, 'true_vessel_area_change': -0.0972}
+{'image': 'Image_13L', 'scenario': 'stable', 'decision': 'report', 'significant': False, 'measured_density_change': -0.0023, 'true_vessel_area_change': 0.0}
+{'image': 'Image_13L', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.088, 'true_vessel_area_change': -0.0794}
+{'image': 'Image_13L', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': None, 'measured_density_change': None, 'true_vessel_area_change': -0.0794}
+{'image': 'Image_13R', 'scenario': 'stable', 'decision': 'report', 'significant': True, 'measured_density_change': -0.0315, 'true_vessel_area_change': 0.0}
+{'image': 'Image_13R', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.0934, 'true_vessel_area_change': -0.086}
+{'image': 'Image_13R', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': None, 'measured_density_change': None, 'true_vessel_area_change': -0.086}
+{'image': 'Image_14L', 'scenario': 'stable', 'decision': 'report', 'significant': False, 'measured_density_change': -0.0083, 'true_vessel_area_change': 0.0}
+{'image': 'Image_14L', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.0738, 'true_vessel_area_change': -0.0916}
+{'image': 'Image_14L', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': None, 'measured_density_change': None, 'true_vessel_area_change': -0.0916}
+{'image': 'Image_14R', 'scenario': 'stable', 'decision': 'report', 'significant': False, 'measured_density_change': -0.0009, 'true_vessel_area_change': 0.0}
+{'image': 'Image_14R', 'scenario': 'progression', 'decision': 'report', 'significant': True, 'measured_density_change': -0.0423, 'true_vessel_area_change': -0.0596}
+{'image': 'Image_14R', 'scenario': 'poor_quality', 'decision': 'defer', 'significant': True, 'measured_density_change': -0.8242, 'true_vessel_area_change': -0.0596}
+AGENT: {"stable": "7/8", "progression": "8/8", "poor_quality": "8/8", "progression_mean_abs_error_pct_points": 1.18}

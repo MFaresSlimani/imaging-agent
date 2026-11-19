@@ -1,0 +1,161 @@
+{
+  "decision": {
+    "accepted": true,
+    "decision": "report",
+    "summary": "Decrease in vessel density of 9.5%."
+  },
+  "trace": [
+    {
+      "step": 1,
+      "planner": "rules",
+      "tool": "segment",
+      "args": {
+        "visit": "baseline",
+        "tta": "basic"
+      },
+      "result": {
+        "visit": "baseline",
+        "tta": "basic",
+        "mc_passes": 1,
+        "n_samples": 2,
+        "mean_std": 0.0348,
+        "ambiguous_ratio": 0.1477,
+        "within_policy": true
+      },
+      "ms": 373
+    },
+    {
+      "step": 2,
+      "planner": "rules",
+      "tool": "segment",
+      "args": {
+        "visit": "followup",
+        "tta": "basic"
+      },
+      "result": {
+        "visit": "followup",
+        "tta": "basic",
+        "mc_passes": 1,
+        "n_samples": 2,
+        "mean_std": 0.033,
+        "ambiguous_ratio": 0.1289,
+        "within_policy": true
+      },
+      "ms": 160
+    },
+    {
+      "step": 3,
+      "planner": "rules",
+      "tool": "register",
+      "args": {},
+      "result": {
+        "shift_px": [
+          -0.7,
+          -3.0
+        ],
+        "ncc": 0.9987,
+        "within_policy": true
+      },
+      "ms": 105
+    },
+    {
+      "step": 4,
+      "planner": "rules",
+      "tool": "measure",
+      "args": {
+        "visit": "baseline"
+      },
+      "result": {
+        "visit": "baseline",
+        "density": {
+          "value": 0.0846,
+          "band": [
+            0.08081,
+            0.08875
+          ]
+        },
+        "length_px": {
+          "value": 7383,
+          "band": [
+            7245,
+            7607
+          ]
+        }
+      },
+      "ms": 90
+    },
+    {
+      "step": 5,
+      "planner": "rules",
+      "tool": "measure",
+      "args": {
+        "visit": "followup"
+      },
+      "result": {
+        "visit": "followup",
+        "density": {
+          "value": 0.07659,
+          "band": [
+            0.07337,
+            0.08002
+          ]
+        },
+        "length_px": {
+          "value": 5601,
+          "band": [
+            5513,
+            5756
+          ]
+        }
+      },
+      "ms": 149
+    },
+    {
+      "step": 6,
+      "planner": "rules",
+      "tool": "compare",
+      "args": {},
+      "result": {
+        "changes": {
+          "density": {
+            "relative_change": -0.0947,
+            "bands_overlap": false
+          },
+          "length_px": {
+            "relative_change": -0.2414,
+            "bands_overlap": false
+          }
+        },
+        "change_beyond_uncertainty": true,
+        "rule": "|change| > repeatability limit 2.9%",
+        "plausible": true,
+        "summary": "decrease in vessel density of 9.5%"
+      },
+      "ms": 0
+    },
+    {
+      "step": 7,
+      "planner": "rules",
+      "tool": "finish",
+      "args": {
+        "decision": "report",
+        "summary": "Decrease in vessel density of 9.5%."
+      },
+      "result": {
+        "accepted": true,
+        "decision": "report",
+        "summary": "Decrease in vessel density of 9.5%."
+      },
+      "ms": 0
+    }
+  ],
+  "policy": {
+    "max_uncertainty": 0.0871,
+    "max_ambiguous_ratio": 0.262,
+    "min_registration_ncc": 0.8,
+    "min_detectable_change": 0.0292,
+    "max_plausible_change": 0.3
+  },
+  "planner": "rules",
+  "model": null
+}

@@ -60,3 +60,12 @@ def test_guard_refuses_unsafe_report():
     agent.call("segment", {"visit": "followup"})
     r = agent.call("finish", {"decision": "report", "summary": "looks fine"})
     assert r["accepted"] is False
+
+
+def test_implausible_change_is_deferred():
+    """A confidently-wrong segmentation (vessels vanish, low uncertainty) must not be reported."""
+    d, case, seg = _setup("progression")
+    seg.gt = {"baseline": d["gt"]["baseline"], "followup": d["gt"]["followup"] & (np.random.default_rng(0).random(d["fov"].shape) < 0.3)}
+    res = Agent(case, seg, planner="rules").run()
+    assert res["decision"]["decision"] == "defer"
+    assert "implausible" in res["decision"]["summary"]

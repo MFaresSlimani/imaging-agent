@@ -1,0 +1,91 @@
+{
+  "decision": {
+    "accepted": true,
+    "decision": "defer",
+    "summary": "The followup image is too uncertain to measure (mean std 0.1698, ambiguous ratio 0.3974) even after 8x TTA and MC dropout. Please review image quality."
+  },
+  "trace": [
+    {
+      "step": 1,
+      "planner": "rules",
+      "tool": "segment",
+      "args": {
+        "visit": "baseline",
+        "tta": "basic"
+      },
+      "result": {
+        "visit": "baseline",
+        "tta": "basic",
+        "mc_passes": 1,
+        "n_samples": 2,
+        "mean_std": 0.0348,
+        "ambiguous_ratio": 0.1477,
+        "within_policy": true
+      },
+      "ms": 356
+    },
+    {
+      "step": 2,
+      "planner": "rules",
+      "tool": "segment",
+      "args": {
+        "visit": "followup",
+        "tta": "basic"
+      },
+      "result": {
+        "visit": "followup",
+        "tta": "basic",
+        "mc_passes": 1,
+        "n_samples": 2,
+        "mean_std": 0.1036,
+        "ambiguous_ratio": 0.3224,
+        "within_policy": false
+      },
+      "ms": 155
+    },
+    {
+      "step": 3,
+      "planner": "rules",
+      "tool": "segment",
+      "args": {
+        "visit": "followup",
+        "tta": "full",
+        "mc_passes": 4
+      },
+      "result": {
+        "visit": "followup",
+        "tta": "full",
+        "mc_passes": 4,
+        "n_samples": 32,
+        "mean_std": 0.1698,
+        "ambiguous_ratio": 0.3974,
+        "within_policy": false
+      },
+      "ms": 2388
+    },
+    {
+      "step": 4,
+      "planner": "rules",
+      "tool": "finish",
+      "args": {
+        "decision": "defer",
+        "summary": "The followup image is too uncertain to measure (mean std 0.1698, ambiguous ratio 0.3974) even after 8x TTA and MC dropout. Please review image quality."
+      },
+      "result": {
+        "accepted": true,
+        "decision": "defer",
+        "summary": "The followup image is too uncertain to measure (mean std 0.1698, ambiguous ratio 0.3974) even after 8x TTA and MC dropout. Please review image quality."
+      },
+      "ms": 0
+    }
+  ],
+  "policy": {
+    "max_uncertainty": 0.0871,
+    "max_ambiguous_ratio": 0.262,
+    "min_registration_ncc": 0.8,
+    "min_detectable_change": 0.0292,
+    "max_plausible_change": 0.3
+  },
+  "planner": "rules",
+  "model": null
+}

@@ -44,9 +44,25 @@ def build_model(arch: str = "small-unet") -> nn.Module:
         return SmallUNet()
     if arch == "smp-unet":
         # Same setup as the A2I-26 comparative study: U-Net, ResNet-34 encoder.
-        import segmentation_models_pytorch as smp
-        return smp.Unet("resnet34", encoder_weights=None, in_channels=3, classes=1)
+        return SmpUNet(pretrained=False)
     raise ValueError(f"unknown arch {arch}")
+
+
+class SmpUNet(nn.Module):
+    """segmentation-models-pytorch U-Net (ResNet-34) with ImageNet normalization
+    built in and dropout before the head, so MC dropout has something to sample."""
+
+    def __init__(self, pretrained=True, p=0.2):
+        super().__init__()
+        import segmentation_models_pytorch as smp
+        self.net = smp.Unet("resnet34", encoder_weights="imagenet" if pretrained else None,
+                            in_channels=3, classes=1, decoder_attention_type=None)
+        self.net.segmentation_head = nn.Sequential(nn.Dropout2d(p), self.net.segmentation_head)
+        self.register_buffer("mean", torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1))
+        self.register_buffer("std", torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1))
+
+    def forward(self, x):
+        return self.net((x - self.mean) / self.std)
 
 
 # The 8 dihedral transforms; each is (forward, inverse) on NCHW tensors.
@@ -81,12 +97,15 @@ class Segmenter:
     @torch.no_grad()
     def predict(self, img: np.ndarray, tta: str = "basic", mc_passes: int = 1):
         """img HxWx3 float [0,1]. Returns (mean prob HxW, std HxW, n_samples)."""
+        h, w = img.shape[:2]
         x = torch.from_numpy(img).permute(2, 0, 1)[None].float().to(self.device)
+        ph, pw = (-h) % 32, (-w) % 32  # pad to a multiple of 32 (U-Net downsampling)
+        x = F.pad(x, (0, pw, 0, ph))
         self._enable_mc_dropout(mc_passes > 1)
         samples = []
         for fwd, inv in _TTA[:TTA_LEVELS[tta]]:
             for _ in range(mc_passes):
                 samples.append(torch.sigmoid(inv(self.model(fwd(x)))))
         self._enable_mc_dropout(False)
-        s = torch.cat(samples, 0)[:, 0]
+        s = torch.cat(samples, 0)[:, 0, :h, :w]
         return s.mean(0).cpu().numpy(), s.std(0, unbiased=False).cpu().numpy(), len(samples)

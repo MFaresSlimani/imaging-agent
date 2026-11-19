@@ -90,7 +90,7 @@ def render(tree: VesselTree, seed: int = 0, noise: float = 0.02):
     return img.astype(np.float32), mask & fov, fov
 
 
-def progress(tree: VesselTree, seed: int, prune: float = 0.35, thin: float = 0.85) -> VesselTree:
+def progress(tree: VesselTree, seed: int, prune: float = 0.3, thin: float = 0.93) -> VesselTree:
     """Simulate vessel rarefaction at follow-up: drop small branches, thin the rest."""
     rng = np.random.default_rng(seed)
     out = VesselTree(tree.size, tree.disc)
@@ -108,13 +108,15 @@ def shift(img: np.ndarray, dy: float, dx: float) -> np.ndarray:
 
 
 def degrade(img: np.ndarray, seed: int, strength: float = 1.0) -> np.ndarray:
-    """Simulate a poor-quality acquisition (media opacity / haze + blur + noise)."""
+    """Simulate a poor-quality acquisition (media opacity / haze + blur + noise).
+    Works for any image size; blur scales with resolution."""
     rng = np.random.default_rng(seed)
-    s = img.shape[0]
-    yy, xx = np.mgrid[:s, :s]
-    cy, cx = rng.uniform(0.35, 0.65, 2) * s
-    haze = np.exp(-((yy - cy) ** 2 + (xx - cx) ** 2) / (2 * (s * 0.28) ** 2)) * strength
-    blurred = np.stack([ndi.gaussian_filter(img[..., c], 2.5 * strength) for c in range(3)], -1)
+    h, w = img.shape[:2]
+    scale = min(h, w) / 256
+    yy, xx = np.mgrid[:h, :w]
+    cy, cx = rng.uniform(0.35, 0.65) * h, rng.uniform(0.35, 0.65) * w
+    haze = np.exp(-((yy - cy) ** 2 + (xx - cx) ** 2) / (2 * (min(h, w) * 0.28) ** 2)) * strength
+    blurred = np.stack([ndi.gaussian_filter(img[..., c], 2.5 * strength * scale) for c in range(3)], -1)
     out = (1 - haze[..., None]) * img + haze[..., None] * (0.6 * blurred + 0.4 * blurred.mean())
     out += rng.normal(0, 0.05 * strength, out.shape)
     return np.clip(out, 0, 1).astype(np.float32) * (img.sum(-1, keepdims=True) > 0)

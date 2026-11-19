@@ -14,6 +14,13 @@ POLICY = {
     "max_uncertainty": 0.03,      # mean predictive std on candidate vessel pixels (clean ~0.005-0.016, degraded ~0.044)
     "max_ambiguous_ratio": 0.10,  # ambiguous pixels (0.3<p<0.7) per confident vessel pixel
     "min_registration_ncc": 0.80, # normalized cross-correlation after alignment
+    # Repeatability limit: smallest relative density change treated as real.
+    # None = fall back to "uncertainty bands do not overlap". Set from stable
+    # scan pairs on calibration subjects (see scripts/evaluate_chase.py).
+    "min_detectable_change": None,
+    # Plausibility: vessel density does not halve between two visits. A larger
+    # change means one acquisition failed, even if the model was confident.
+    "max_plausible_change": 0.30,
 }
 
 
@@ -94,8 +101,15 @@ def compare(case: Case, ref: str = "baseline", mov: str = "followup") -> dict:
         rel = (b["value"] - a["value"]) / max(a["value"], 1e-8)
         overlap = not (b["band"][1] < a["band"][0] or b["band"][0] > a["band"][1])
         out[k] = {"relative_change": round(rel, 4), "bands_overlap": overlap}
-    significant = not any(v["bands_overlap"] for v in out.values())
+    mdc = POLICY.get("min_detectable_change")
+    if mdc is None:
+        significant = not any(v["bands_overlap"] for v in out.values())
+        rule = "uncertainty bands do not overlap"
+    else:
+        significant = abs(out["density"]["relative_change"]) > mdc
+        rule = f"|change| > repeatability limit {mdc:.1%}"
     direction = "decrease" if out["density"]["relative_change"] < 0 else "increase"
-    return {"changes": out, "change_beyond_uncertainty": significant,
+    plausible = abs(out["density"]["relative_change"]) <= POLICY["max_plausible_change"]
+    return {"changes": out, "change_beyond_uncertainty": significant, "rule": rule, "plausible": plausible,
             "summary": f"{direction} in vessel density of {abs(out['density']['relative_change']):.1%}"
                        + ("" if significant else " (within measurement uncertainty)")}
