@@ -1,0 +1,9 @@
+torch>=2.2
+numpy
+scipy
+scikit-image
+matplotlib
+pytest
+# optional
+anthropic                     # Claude planner (set ANTHROPIC_API_KEY)
+segmentation-models-pytorch   # --arch smp-unet, to load a CHASE_DB1 checkpoint
